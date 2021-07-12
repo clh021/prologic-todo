@@ -57,7 +57,7 @@ const pkgdef :Spk.PackageDefinition = (
       website = "https://prologic.github.io/todo",
       # This should be the app's main website url.
 
-      codeUrl = "https://github.com/prologic/todo",
+      codeUrl = "https://git.mills.io/prologic/todo",
       # URL of the app's source code repository, e.g. a GitHub URL.
       # Required if you specify a license requiring redistributing code, but optional otherwise.
 

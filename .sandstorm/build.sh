@@ -3,9 +3,9 @@ set -euo pipefail
 
 export GOPATH=$HOME/go
 
-[ -d $GOPATH/src/github.com/prologic/ ] || mkdir -p $GOPATH/src/github.com/prologic/
-[ -L $GOPATH/src/github.com/prologic/todo ] || \
-	ln -s /opt/app $GOPATH/src/github.com/prologic/todo
+[ -d $GOPATH/src/git.mills.io/prologic/ ] || mkdir -p $GOPATH/src/git.mills.io/prologic/
+[ -L $GOPATH/src/git.mills.io/prologic/todo ] || \
+	ln -s /opt/app $GOPATH/src/git.mills.io/prologic/todo
 
 cd /opt/app
 go get -v -d ./...

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/namsral/flag"
-	"github.com/prologic/bitcask"
+	"git.mills.io/prologic/bitcask"
 )
 
 var (

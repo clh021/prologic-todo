@@ -1,4 +1,4 @@
-module github.com/prologic/todo
+module git.mills.io/prologic/todo
 
 go 1.14
 
@@ -9,7 +9,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/namsral/flag v1.7.4-pre
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prologic/bitcask v0.3.5
+	git.mills.io/prologic/bitcask v0.3.5
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/thoas/stats v0.0.0-20190407194641-965cb2de1678

@@ -1,9 +1,9 @@
 # todo
 [![Build Status](https://cloud.drone.io/api/badges/prologic/todo/status.svg)](https://cloud.drone.io/prologic/todo)
-[![GoDoc](https://godoc.org/github.com/prologic/todo?status.svg)](https://godoc.org/github.com/prologic/todo)
-[![Go Report Card](https://goreportcard.com/badge/github.com/prologic/todo)](https://goreportcard.com/report/github.com/prologic/todo)
+[![GoDoc](https://godoc.org/git.mills.io/prologic/todo?status.svg)](https://godoc.org/git.mills.io/prologic/todo)
+[![Go Report Card](https://goreportcard.com/badge/git.mills.io/prologic/todo)](https://goreportcard.com/report/git.mills.io/prologic/todo)
 [![CodeCov](https://codecov.io/gh/prologic/todo/branch/master/graph/badge.svg)](https://codecov.io/gh/prologic/todo)
-[![Sourcegraph](https://sourcegraph.com/github.com/prologic/msgbus/-/badge.svg)](https://sourcegraph.com/github.com/prologic/msgbus?badge)
+[![Sourcegraph](https://sourcegraph.com/git.mills.io/prologic/msgbus/-/badge.svg)](https://sourcegraph.com/git.mills.io/prologic/msgbus?badge)
 [![Docker Version](https://images.microbadger.com/badges/version/prologic/todo.svg)](https://microbadger.com/images/prologic/todo)
 [![Image Info](https://images.microbadger.com/badges/image/prologic/todo.svg)](https://microbadger.com/images/prologic/todo)
 
@@ -94,7 +94,7 @@ volumes:
 
 #### Screenshots
 
-You can find screenshots and the CSS of all the preset color themes in both mobile and desktop views on the [Wiki Page](https://github.com/prologic/todo/wiki/Color-Themes).
+You can find screenshots and the CSS of all the preset color themes in both mobile and desktop views on the [Wiki Page](https://git.mills.io/prologic/todo/wiki/Color-Themes).
 
 
 ### Custom Color Themes
@@ -148,7 +148,7 @@ volumes:
 ## Development / Non-Dockerized Deploy
 You can quickly run a todo instance from source using the Makefile:
 ```
-$ git clone https://github.com/prologic/todo.git
+$ git clone https://git.mills.io/prologic/todo.git
 $ cd todo
 $ make
 ```
