@@ -9,10 +9,10 @@ import (
 	"sort"
 	"strconv"
 
+	"git.mills.io/prologic/bitcask"
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/NYTimes/gziphandler"
 	"github.com/julienschmidt/httprouter"
-	"git.mills.io/prologic/bitcask"
 	"github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 	log "github.com/sirupsen/logrus"
@@ -211,6 +211,11 @@ func (s *server) DoneHandler() httprouter.Handle {
 		key := fmt.Sprintf("todo_%d", i)
 		data, err := db.Get([]byte(key))
 		if err != nil {
+			if err != bitcask.ErrKeyNotFound {
+				log.WithError(err).WithField("key", key).Error("todo not found")
+				http.Error(w, "Not Found", http.StatusNotFound)
+				return
+			}
 			log.WithError(err).WithField("key", key).Error("error retriving todo")
 			http.Error(w, "Internal Error", http.StatusInternalServerError)
 			return
