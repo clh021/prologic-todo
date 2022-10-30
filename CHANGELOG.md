@@ -1,4 +1,16 @@
 
+<a name="0.0.2"></a>
+## [0.0.2](https://git.mills.io/prologic/todo/compare/0.0.1...0.0.2) (2022-10-30)
+
+### Bug Fixes
+
+* Fix Drone CI
+
+### Features
+
+* Add Drone CI
+
+
 <a name="0.0.1"></a>
 ## 0.0.1 (2022-10-30)
 
@@ -21,6 +33,7 @@
 
 ### Updates
 
+* Update CHANGELOG for 0.0.1
 * Update README with color themes wiki page (#32)
 * Update README and remove unused files (#28)
 * Update layout and add color themes (#27)
