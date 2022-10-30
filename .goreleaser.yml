@@ -1,0 +1,30 @@
+---
+builds:
+  - id: todo
+    binary: todo
+    main: .
+    flags: -tags "static_build"
+    ldflags: >-
+      -w
+      -X git.mills.io/prologic/todo.Version={{.Version}}
+      -X git.mills.io/prologic/todo.Commit={{.Commit}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - freebsd
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 6
+      - 7
+signs:
+  - artifacts: checksum
+release:
+  gitea:
+    owner: prologic
+    name: todo
+gitea_urls:
+  api: https://git.mills.io/api/v1/
