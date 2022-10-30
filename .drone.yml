@@ -11,7 +11,7 @@ steps:
   - name: build-image-push
     image: plugins/kaniko
     settings:
-      repo: prologic/maintenance-server
+      repo: prologic/todo
       tags: latest
       build_args:
         - VERSION=edge
@@ -24,7 +24,7 @@ steps:
       - build-and-test
     when:
       branch:
-        - main
+        - master
       event:
         - push
 
@@ -40,7 +40,7 @@ steps:
 
 trigger:
   branch:
-    - main
+    - master
   event:
     - tag
     - push
