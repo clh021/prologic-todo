@@ -10,7 +10,8 @@ import (
 	"strconv"
 
 	"git.mills.io/prologic/bitcask"
-	rice "github.com/GeertJohan/go.rice"
+	"git.mills.io/prologic/todo/static"
+	"git.mills.io/prologic/todo/templates"
 	"github.com/NYTimes/gziphandler"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rcrowley/go-metrics"
@@ -49,7 +50,7 @@ func (c *counters) DecBy(name string, n int64) {
 
 type server struct {
 	bind           string
-	templates      *templates
+	templates      *templateManager
 	router         *httprouter.Router
 	maxItems       int
 	maxTitleLength int
@@ -316,12 +317,12 @@ func (s *server) initRoutes() {
 
 	s.router.ServeFiles(
 		"/css/*filepath",
-		rice.MustFindBox("static/css").HTTPBox(),
+		static.GetSubFilesystem("css"),
 	)
 
 	s.router.ServeFiles(
 		"/icons/*filepath",
-		rice.MustFindBox("static/icons").HTTPBox(),
+		static.GetSubFilesystem("icons"),
 	)
 
 	s.router.GET("/", s.IndexHandler())
@@ -354,11 +355,9 @@ func newServer(bind string, maxItems int, maxTitleLength int) *server {
 	}
 
 	// Templates
-	box := rice.MustFindBox("templates")
-
 	indexTemplate := template.New("index")
-	template.Must(indexTemplate.Parse(box.MustString("index.html")))
-	template.Must(indexTemplate.Parse(box.MustString("base.html")))
+	template.Must(indexTemplate.Parse(templates.MustGetTemplate("index.html")))
+	template.Must(indexTemplate.Parse(templates.MustGetTemplate("base.html")))
 
 	server.templates.Add("index", indexTemplate)
 

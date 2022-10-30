@@ -11,28 +11,28 @@ import (
 
 type templateMap map[string]*template.Template
 
-type templates struct {
+type templateManager struct {
 	sync.Mutex
 
 	base      string
 	templates templateMap
 }
 
-func newTemplates(base string) *templates {
-	return &templates{
+func newTemplates(base string) *templateManager {
+	return &templateManager{
 		base:      base,
 		templates: make(templateMap),
 	}
 }
 
-func (t *templates) Add(name string, template *template.Template) {
+func (t *templateManager) Add(name string, template *template.Template) {
 	t.Lock()
 	defer t.Unlock()
 
 	t.templates[name] = template
 }
 
-func (t *templates) Exec(name string, ctx interface{}) (io.WriterTo, error) {
+func (t *templateManager) Exec(name string, ctx interface{}) (io.WriterTo, error) {
 	t.Lock()
 	defer t.Unlock()
 

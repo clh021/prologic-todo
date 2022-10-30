@@ -1,12 +1,10 @@
 module git.mills.io/prologic/todo
 
-go 1.14
+go 1.16
 
 require (
 	git.mills.io/prologic/bitcask v1.0.2
-	github.com/GeertJohan/go.rice v1.0.0
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/daaku/go.zipexe v1.0.1 // indirect
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/namsral/flag v1.7.4-pre
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
