@@ -1,3 +1,7 @@
+*~
 *.db
-todo
-/static/css/color-theme.css
+
+**/.DS_Store
+
+/dist
+/todo

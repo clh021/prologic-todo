@@ -1,30 +1,68 @@
-FROM golang:alpine AS builder
-# Install Dependencies
-RUN \
-    apk add --update git && \
-    rm -rf /var/cache/apk/*
-# Add user
-RUN addgroup -S gouser && adduser -S gouser -G gouser 
-# Prepare folders and install main app
-RUN mkdir -p /usr/local/go/src/todo
-WORKDIR /usr/local/go/src/todo
-COPY . /usr/local/go/src/todo
-RUN go get -v -d
-RUN go install -v
-RUN go build .
-# ---------
-FROM alpine:latest
-# Copy CA certificates to be able to connect to HTTPS sites.
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
- # COPY /etc/passwd and /etc/group to have the user in new image
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /etc/group /etc/group
-# Copy app files
-ENV GOPATH=/usr/local/go
-COPY --from=builder --chown=gouser:gouser /usr/local/go/src/todo/ /usr/local/go/src/todo
-WORKDIR /usr/local/go/src/todo
-# Drop privileges, don't run as root
-USER gouser:gouser
+# Build
+FROM golang:alpine AS build
 
-EXPOSE 8000/tcp
-ENTRYPOINT ["/usr/local/go/src/todo/todo"]
+RUN apk add --no-cache -U build-base git make
+
+RUN mkdir -p /src
+
+WORKDIR /src
+
+# Copy Makefile
+COPY Makefile ./
+
+# Install deps
+RUN make deps
+
+# Copy go.mod and go.sum and install and cache dependencies
+COPY go.mod .
+COPY go.sum .
+
+# Copy static assets
+COPY ./static/* ./static/
+COPY ./static/css/* ./static/css/
+COPY ./static/icons/* ./static/icons/
+COPY ./static/color-themes/* ./static/color-themes/
+
+# Copy templates
+COPY ./templates/* ./templates/
+
+# Copy sources
+COPY *.go ./
+
+# Version/Commit (there there is no .git in Docker build context)
+# NOTE: This is fairly low down in the Dockerfile instructions so
+#       we don't break the Docker build cache just be changing
+#       unrelated files that actually haven't changed but caused the
+#       COMMIT value to change.
+ARG VERSION="0.0.0"
+ARG COMMIT="HEAD"
+
+# Build server binary
+RUN make build VERSION=$VERSION COMMIT=$COMMIT
+
+# Runtime
+FROM alpine:latest
+
+RUN apk --no-cache -U add su-exec shadow
+
+ENV PUID=1000
+ENV PGID=1000
+
+RUN addgroup -g "${PGID}" todo && \
+    adduser -D -H -G todo -h /var/empty -u "${PUID}" todo && \
+    mkdir -p /data && chown -R todo:todo /data
+
+VOLUME /data
+
+WORKDIR /
+
+# force cgo resolver
+ENV GODEBUG=netdns=cgo
+
+COPY --from=build /src/todo /usr/local/bin/todo
+
+COPY .dockerfiles/entrypoint.sh /init
+
+ENTRYPOINT ["/init"]
+
+CMD ["todo", "-dbpath", "/data/todo.db"]

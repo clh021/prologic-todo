@@ -14,39 +14,9 @@ import (
 	"git.mills.io/prologic/todo/templates"
 	"github.com/NYTimes/gziphandler"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rcrowley/go-metrics"
-	"github.com/rcrowley/go-metrics/exp"
 	log "github.com/sirupsen/logrus"
-	"github.com/thoas/stats"
 	"github.com/unrolled/logger"
 )
-
-type counters struct {
-	r metrics.Registry
-}
-
-func newCounters() *counters {
-	counters := &counters{
-		r: metrics.NewRegistry(),
-	}
-	return counters
-}
-
-func (c *counters) Inc(name string) {
-	metrics.GetOrRegisterCounter(name, c.r).Inc(1)
-}
-
-func (c *counters) Dec(name string) {
-	metrics.GetOrRegisterCounter(name, c.r).Dec(1)
-}
-
-func (c *counters) IncBy(name string, n int64) {
-	metrics.GetOrRegisterCounter(name, c.r).Inc(n)
-}
-
-func (c *counters) DecBy(name string, n int64) {
-	metrics.GetOrRegisterCounter(name, c.r).Dec(n)
-}
 
 type server struct {
 	bind           string
@@ -54,13 +24,10 @@ type server struct {
 	router         *httprouter.Router
 	maxItems       int
 	maxTitleLength int
+	colorTheme     string
 
 	// Logger
 	logger *logger.Logger
-
-	// Stats/Metrics
-	counters *counters
-	stats    *stats.Stats
 }
 
 func (s *server) render(name string, w http.ResponseWriter, ctx interface{}) {
@@ -83,8 +50,6 @@ type templateContext struct {
 
 func (s *server) IndexHandler() httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		s.counters.Inc("n_index")
-
 		var todoList TodoList
 
 		err := db.Fold(func(key []byte) error {
@@ -125,8 +90,6 @@ func (s *server) IndexHandler() httprouter.Handle {
 
 func (s *server) AddHandler() httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		s.counters.Inc("n_add")
-
 		var nextID uint64
 		rawNextID, err := db.Get([]byte("nextid"))
 		if err != nil {
@@ -185,8 +148,6 @@ func (s *server) AddHandler() httprouter.Handle {
 
 func (s *server) DoneHandler() httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		s.counters.Inc("n_done")
-
 		var id string
 
 		id = p.ByName("id")
@@ -251,8 +212,6 @@ func (s *server) DoneHandler() httprouter.Handle {
 
 func (s *server) ClearHandler() httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		s.counters.Inc("n_clear")
-
 		var id string
 
 		id = p.ByName("id")
@@ -285,26 +244,13 @@ func (s *server) ClearHandler() httprouter.Handle {
 	}
 }
 
-func (s *server) statsHandler() httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		bs, err := json.Marshal(s.stats.Data())
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		w.Write(bs)
-	}
-}
-
 func (s *server) listenAndServe() {
 	log.Fatal(
 		http.ListenAndServe(
 			s.bind,
 			s.logger.Handler(
-				s.stats.Handler(
-					gziphandler.GzipHandler(
-						s.router,
-					),
+				gziphandler.GzipHandler(
+					s.router,
 				),
 			),
 		),
@@ -312,9 +258,6 @@ func (s *server) listenAndServe() {
 }
 
 func (s *server) initRoutes() {
-	s.router.Handler("GET", "/debug/metrics", exp.ExpHandler(s.counters.r))
-	s.router.GET("/debug/stats", s.statsHandler())
-
 	s.router.ServeFiles(
 		"/css/*filepath",
 		static.GetSubFilesystem("css"),
@@ -324,6 +267,13 @@ func (s *server) initRoutes() {
 		"/icons/*filepath",
 		static.GetSubFilesystem("icons"),
 	)
+
+	s.router.GET("/color-theme.css", func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+		data := static.MustGetFile(fmt.Sprintf("color-themes/%s.css", s.colorTheme))
+		w.Header().Set("Content-Type", "text/css")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
+		_, _ = w.Write(data)
+	})
 
 	s.router.GET("/", s.IndexHandler())
 	s.router.POST("/add", s.AddHandler())
@@ -335,23 +285,20 @@ func (s *server) initRoutes() {
 	s.router.POST("/clear/:id", s.ClearHandler())
 }
 
-func newServer(bind string, maxItems int, maxTitleLength int) *server {
+func newServer(bind string, maxItems int, maxTitleLength int, colorTheme string) *server {
 	server := &server{
 		bind:           bind,
 		router:         httprouter.New(),
 		templates:      newTemplates("base"),
 		maxItems:       maxItems,
 		maxTitleLength: maxTitleLength,
+		colorTheme:     colorTheme,
 
 		// Logger
 		logger: logger.New(logger.Options{
 			Prefix:               "todo",
 			RemoteAddressHeaders: []string{"X-Forwarded-For"},
 		}),
-
-		// Stats/Metrics
-		counters: newCounters(),
-		stats:    stats.New(),
 	}
 
 	// Templates

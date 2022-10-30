@@ -1,12 +1,11 @@
 package main
 
 import (
-	"io"
 	"log"
 	"os"
 
-	"github.com/namsral/flag"
 	"git.mills.io/prologic/bitcask"
+	"github.com/namsral/flag"
 )
 
 var (
@@ -51,12 +50,15 @@ func main() {
 	}
 	defer db.Close()
 
+	/* TODO: Fix custom color theme on disk
 	selectColorTheme(colorTheme, colorPageBackground, colorInputBackground, colorForeground,
 		colorCheckMark, colorXMark, colorLabel)
+	*/
 
-	newServer(bind, maxItems, maxTitleLength).listenAndServe()
+	newServer(bind, maxItems, maxTitleLength, colorTheme).listenAndServe()
 }
 
+/* TODO: Fix custom color theme on disk
 func selectColorTheme(colorTheme string, colorPageBackground string, colorInputBackground string,
 	colorForeground string, colorCheckMark string, colorXMark string, colorLabel string) {
 	if colorTheme == "custom" {
@@ -96,3 +98,4 @@ func selectColorTheme(colorTheme string, colorPageBackground string, colorInputB
 		}
 	}
 }
+*/

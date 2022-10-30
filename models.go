@@ -21,11 +21,6 @@ func newTodo(title string) *Todo {
 	}
 }
 
-func (t *Todo) setTitle(title string) {
-	t.Title = title
-	t.UpdatedAt = time.Now()
-}
-
 func (t *Todo) toggleDone() {
 	t.Done = !t.Done
 	t.UpdatedAt = time.Now()
