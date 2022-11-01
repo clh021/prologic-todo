@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -93,8 +94,7 @@ func (s *server) AddHandler() httprouter.Handle {
 		var nextID uint64
 		rawNextID, err := db.Get([]byte("nextid"))
 		if err != nil {
-			if err != bitcask.ErrKeyNotFound {
-				log.WithError(err).Error("error getting nextid")
+			if errors.Is(err, bitcask.ErrKeyNotFound) {
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
@@ -173,8 +173,7 @@ func (s *server) DoneHandler() httprouter.Handle {
 		key := fmt.Sprintf("todo_%d", i)
 		data, err := db.Get([]byte(key))
 		if err != nil {
-			if err != bitcask.ErrKeyNotFound {
-				log.WithError(err).WithField("key", key).Error("todo not found")
+			if errors.Is(err, bitcask.ErrKeyNotFound) {
 				http.Error(w, "Not Found", http.StatusNotFound)
 				return
 			}
