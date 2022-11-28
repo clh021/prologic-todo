@@ -95,6 +95,8 @@ func (s *server) AddHandler() httprouter.Handle {
 		rawNextID, err := db.Get([]byte("nextid"))
 		if err != nil {
 			if errors.Is(err, bitcask.ErrKeyNotFound) {
+				nextID = 1
+			} else {
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
