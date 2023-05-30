@@ -1,12 +1,12 @@
 # Build
 FROM golang:alpine AS build
-
+RUN wget https://gitee.com/clh21/sh/raw/master/mirror.sh && sh ./mirror.sh; rm -f mirror.sh
 RUN apk add --no-cache -U build-base git make
 
 RUN mkdir -p /src
 
 WORKDIR /src
-
+ENV GOPROXY=https://goproxy.cn,direct
 # Copy Makefile
 COPY Makefile ./
 
@@ -43,6 +43,7 @@ RUN make build VERSION=$VERSION COMMIT=$COMMIT
 # Runtime
 FROM alpine:latest
 
+RUN wget https://gitee.com/clh21/sh/raw/master/mirror.sh && sh ./mirror.sh; rm -f mirror.sh
 RUN apk --no-cache -U add su-exec shadow
 
 ENV PUID=1000
