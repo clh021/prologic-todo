@@ -1,3 +1,4 @@
+# docker build -t registry.lazycat.cloud/appdb/prologic/todo:202305301 .
 # Build
 FROM golang:alpine AS build
 RUN wget https://gitee.com/clh21/sh/raw/master/mirror.sh && sh ./mirror.sh; rm -f mirror.sh
@@ -46,12 +47,12 @@ FROM alpine:latest
 RUN wget https://gitee.com/clh21/sh/raw/master/mirror.sh && sh ./mirror.sh; rm -f mirror.sh
 RUN apk --no-cache -U add su-exec shadow
 
-ENV PUID=1000
-ENV PGID=1000
+# ENV PUID=1000
+# ENV PGID=1000
 
-RUN addgroup -g "${PGID}" todo && \
-    adduser -D -H -G todo -h /var/empty -u "${PUID}" todo && \
-    mkdir -p /data && chown -R todo:todo /data
+# RUN addgroup -g "${PGID}" todo && \
+#     adduser -D -H -G todo -h /var/empty -u "${PUID}" todo && \
+#     mkdir -p /data && chown -R todo:todo /data
 
 VOLUME /data
 
@@ -64,6 +65,6 @@ COPY --from=build /src/todo /usr/local/bin/todo
 
 COPY .dockerfiles/entrypoint.sh /init
 
-ENTRYPOINT ["/init"]
+# ENTRYPOINT ["/init"]
 
 CMD ["todo", "-dbpath", "/data/todo.db"]
